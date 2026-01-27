@@ -74,32 +74,31 @@ public class Delivery {
         calculateTotalItems();
     }
 
-    /*
     public void editPreparationDetails(PreparationDetails details){
+        verifyIfCanBeEdited();
         setSender(details.getSender());
         setRecipient(details.getRecipient());
         setDistanceFee(details.getDistanceFee());
         setCourierPayout(details.getCourierPayout());
 
         setExpectedDeliveryAt(OffsetDateTime.now().plus(details.getExpectedDeliveryTime()));
-        setTotalCost(this.getDistanceFee().add(this.getCourierPayout().add(this.getDistanceFee())));
+        setTotalCost(this.getDistanceFee().add(this.getCourierPayout()));
     }
-    */
 
     public void place(){
         verifyIfCanBePlaced();
-        this.setStatus(DeliveryStatus.WAITING_FOR_COURIER);
+        this.changeStatus(DeliveryStatus.WAITING_FOR_COURIER);
         this.setPlaceAt(OffsetDateTime.now());
     }
 
     public void pickUp(UUID courierId){
         this.setCourierId(courierId);
-        this.setStatus(DeliveryStatus.IN_TRANSIT);
+        this.changeStatus(DeliveryStatus.IN_TRANSIT);
         this.setAssignedAt(OffsetDateTime.now());
     }
 
     public void markAsDelivered(){
-        this.setStatus(DeliveryStatus.DELIVERY);
+        this.changeStatus(DeliveryStatus.DELIVERY);
         this.setFulfilledAt(OffsetDateTime.now());
     }
 
@@ -114,12 +113,20 @@ public class Delivery {
 
     private void verifyIfCanBePlaced() {
         if(!isFilled()){
-            throw new DomainException();
+            throw new DomainException("Falta de informações de envio");
         }
         if(!getStatus().equals(DeliveryStatus.DRAFT)){
-            throw new DomainException();
+            throw new DomainException("A entrega em questão não é um rascunho");
         }
 
+    }
+
+
+    private void verifyIfCanBeEdited() {
+         if(!getStatus().equals(DeliveryStatus.DRAFT)){
+             throw new DomainException("Para editar a entrega em questão " +
+                     "é necessario que ela seja um rascunho");
+         }
     }
 
     private boolean isFilled() {
@@ -128,7 +135,15 @@ public class Delivery {
                  && this.getTotalCost() != null;
     }
 
-    /*@Getter
+    private void changeStatus(DeliveryStatus newStatus){
+        if(newStatus != null && this.getStatus().canNotChangeTo(newStatus) ){
+            throw new DomainException(" o status " + this.getStatus() + " nao pode ser" +
+                    " transferido para " + newStatus);
+        }
+        this.setStatus(newStatus);
+    }
+
+    @Getter
     @AllArgsConstructor
     @Builder
     public static class PreparationDetails{
@@ -139,5 +154,5 @@ public class Delivery {
         private Duration expectedDeliveryTime;
     }
 
-     */
+
 }

@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 public class ContactPoint {
     private String zipCode;
-    private String Street;
+    private String street;
     private String number;
     private String complement;
     private String name;
