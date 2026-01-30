@@ -7,7 +7,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - 5432:5432
     networks:
       - local-network
   pgadmin:
@@ -18,7 +18,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: dba@algadelivery.com
       PGADMIN_DEFAULT_PASSWORD: algadelivery
     ports:
-      - "8083:80"
+      - 8083:80
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     networks:
